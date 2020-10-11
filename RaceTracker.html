@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Race Tracker</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+      // Redirect to HTTPS if HTTP is requested.
+      if (window.location.protocol === 'http:') {
+        window.location.href = 'https:' + window.location.href.substring(5);
+      }
+    </script>
+	  
+    <style>
+		table {
+			border: 1px solid black;
+			table-layout: fixed;
+			width: 250px;
+		}
+
+		th, td {
+			border: 1px solid black;
+			width: 100px;
+			overflow: hidden;
+			text-align: center;
+		}
+	</style>
+  </head>  
+  <body>
+    <header class="header">
+      <h1>Pinewood Derby Race Tracker</h1>
+    </header>
+    <main class="main">
+      <div id="notSupported">
+        Sorry, <b>Web Serial</b> is not supported on this device, make sure you're 
+        running Chrome 78 or later and have enabled the 
+        <code>#enable-experimental-web-platform-features</code> flag in
+        <code>chrome://flags</code>
+      </div>
+      <br>
+	  <div align="center">
+      <button id="butConnect" type="button">Connect to Serial Port</button>
+      </div>
+	  <br>
+      <div id="microbit">
+        <span class="mb-button" id="leftBut"></span>
+        <span class="mb-matrix">
+		<div align="center" style="width:100%;">
+			<div>
+				<label for="car1">Car A number (between 1 and 99):</label>
+				<input type="number" id="car1" name="car1" min="1" max="99"><br>
+				<label for="car2">Car B number (between 1 and 99):</label>
+				<input type="number" id="car2" name="car1" min="1" max="99"><br>
+				<label for="car3">Car C number (between 1 and 99):</label>
+				<input type="number" id="car3" name="car1" min="1" max="99"><br>
+				<label for="car4">Car D number (between 1 and 99):</label>
+				<input type="number" id="car4" name="car1" min="1" max="99"><br>
+				<button id="carsubmitbutton" type="button" title="Fill in heat tables with car numbers" onclick="CarSubmit();">Submit Car Numbers</button>
+				<button id="clearracebutton" type="button" title="Clears the results for this race" onclick="ClearRace();">Clear Race</button>
+			</div>
+			<div style="display: inline-block; margin:20px">
+				<table>
+					<tr>
+						<th colspan="4">Heat 1</th>
+					</tr>
+					<tr>
+						<th width="25%">Lane</th>
+						<th width="25%">Car</th>
+						<th width="25%">Place</th>
+						<th width="25%">Time</th>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td id="Heat1Car1Number"></td>
+						<td id="Heat1Car1Place"></td>
+						<td id="Heat1Car1Time"></td>
+					</tr>
+					<tr>
+						<td>B</td>
+						<td id="Heat1Car2Number"></td>
+						<td id="Heat1Car2Place"></td>
+						<td id="Heat1Car2Time"></td>
+					</tr>
+					<tr>
+						<td>C</td>
+						<td id="Heat1Car3Number"></td>
+						<td id="Heat1Car3Place"></td>
+						<td id="Heat1Car3Time"></td>
+					</tr>
+					<tr>
+						<td>D</td>
+						<td id="Heat1Car4Number"></td>
+						<td id="Heat1Car4Place"></td>
+						<td id="Heat1Car4Time"></td>
+					</tr>
+				</table>
+				<br>
+				<button id="ResetHeat" type="button" title="Clears the results for this heat" onclick="ClearHeat(1);">Reset Heat</button>
+			</div>
+			<div style="display: inline-block; margin:20px">
+				<table>
+					<tr>
+						<th colspan="4">Heat 2</th>
+					</tr>
+					<tr>
+						<th width="25%">Lane</th>
+						<th width="25%">Car</th>
+						<th width="25%">Place</th>
+						<th width="25%">Time</th>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td id="Heat2Car4Number"></td>
+						<td id="Heat2Car1Place"></td>
+						<td id="Heat2Car1Time"></td>
+					</tr>
+					<tr>
+						<td>B</td>
+						<td id="Heat2Car1Number"></td>
+						<td id="Heat2Car2Place"></td>
+						<td id="Heat2Car2Time"></td>
+					</tr>
+					<tr>
+						<td>C</td>
+						<td id="Heat2Car2Number"></td>
+						<td id="Heat2Car3Place"></td>
+						<td id="Heat2Car3Time"></td>
+					</tr>
+					<tr>
+						<td>D</td>
+						<td id="Heat2Car3Number"></td>
+						<td id="Heat2Car4Place"></td>
+						<td id="Heat2Car4Time"></td>
+					</tr>
+				</table>
+				<br>
+				<button id="ResetHeat" type="button" title="Clears the results for this heat" onclick="ClearHeat(2);">Reset Heat</button>
+			</div>
+			<div style="display: inline-block; margin:20px">
+				<table>
+					<tr>
+						<th colspan="4">Heat 3</th>
+					</tr>
+					<tr>
+						<th width="25%">Lane</th>
+						<th width="25%">Car</th>
+						<th width="25%">Place</th>
+						<th width="25%">Time</th>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td id="Heat3Car3Number"></td>
+						<td id="Heat3Car1Place"></td>
+						<td id="Heat3Car1Time"></td>
+					</tr>
+					<tr>
+						<td>B</td>
+						<td id="Heat3Car4Number"></td>
+						<td id="Heat3Car2Place"></td>
+						<td id="Heat3Car2Time"></td>
+					</tr>
+					<tr>
+						<td>C</td>
+						<td id="Heat3Car1Number"></td>
+						<td id="Heat3Car3Place"></td>
+						<td id="Heat3Car3Time"></td>
+					</tr>
+					<tr>
+						<td>D</td>
+						<td id="Heat3Car2Number"></td>
+						<td id="Heat3Car4Place"></td>
+						<td id="Heat3Car4Time"></td>
+					</tr>
+				</table>
+				<br>
+				<button id="ResetHeat" type="button" title="Clears the results for this heat" onclick="ClearHeat(3);">Reset Heat</button>
+			</div>
+			<div style="display: inline-block; margin:20px">
+				<table>
+					<tr>
+						<th colspan="4">Heat 4</th>
+					</tr>
+					<tr>
+						<th width="25%">Lane</th>
+						<th width="25%">Car</th>
+						<th width="25%">Place</th>
+						<th width="25%">Time</th>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td id="Heat4Car2Number"></td>
+						<td id="Heat4Car1Place"></td>
+						<td id="Heat4Car1Time"></td>
+					</tr>
+					<tr>
+						<td>B</td>
+						<td id="Heat4Car3Number"></td>
+						<td id="Heat4Car2Place"></td>
+						<td id="Heat4Car2Time"></td>
+					</tr>
+					<tr>
+						<td>C</td>
+						<td id="Heat4Car4Number"></td>
+						<td id="Heat4Car3Place"></td>
+						<td id="Heat4Car3Time"></td>
+					</tr>
+					<tr>
+						<td>D</td>
+						<td id="Heat4Car1Number"></td>
+						<td id="Heat4Car4Place"></td>
+						<td id="Heat4Car4Time"></td>
+					</tr>
+				</table>
+				<br>
+				<button id="ResetHeat" type="button" title="Clears the results for this heat" onclick="ClearHeat(4);">Reset Heat</button>
+			</div>
+		</div>
+        </span>
+        <span class="mb-button" id="rightBut"></span>
+      </div>
+	  <pre id="log"></pre>
+      <script>
+		/*
+		 * @license
+		 * Getting Started with Web Serial Codelab (https://todo)
+		 * Copyright 2019 Google Inc. All rights reserved.
+		 *
+		 * Licensed under the Apache License, Version 2.0 (the "License");
+		 * you may not use this file except in compliance with the License.
+		 * You may obtain a copy of the License at
+		 *
+		 *     https://www.apache.org/licenses/LICENSE-2.0
+		 *
+		 * Unless required by applicable law or agreed to in writing, software
+		 * distributed under the License is distributed on an "AS IS" BASIS,
+		 * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+		 * See the License for the specific language governing permissions and
+		 * limitations under the License
+		 */
+		'use strict';
+
+		let port;
+		let reader;
+		let inputDone;
+		let outputDone;
+		let inputStream;
+		let outputStream;
+		let CarCount = 4;
+		let HeatCount = 4;
+		let Heat = 1;
+		let Position = [];
+
+		const log = document.getElementById('log');
+		const butConnect = document.getElementById('butConnect');
+
+		const GRID_HAPPY = [1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,1,0,0,0,1,0,1,1,1,0];
+		const GRID_SAD =   [1,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,1,1,0,1,0,0,0,1];
+		const GRID_OFF =   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+		const GRID_HEART = [0,1,0,1,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,0,0,1,0,0];
+
+		document.addEventListener('DOMContentLoaded', () => {
+			butConnect.addEventListener('click', clickConnect);
+			// CODELAB: Add feature detection here.
+			if ('serial' in navigator) {
+				document.getElementById('notSupported').style.visibility = "hidden";
+			}
+		});
+		
+		
+		function CarSubmit(){
+			let CarNumbers = [];
+			for(let i = 1; i <= CarCount; i++){
+				CarNumbers.push(document.getElementById("car" + i).value);
+			}
+			for(let i = 1; i <= HeatCount; i++){
+				for(let j = 1; j <= CarCount; j++){
+					document.getElementById("Heat" + i + "Car" + j + "Number").innerHTML = CarNumbers[j - 1];
+				}
+			}
+		}
+		
+		
+		function ClearHeat(ID){
+			for(let i = 1; i <= CarCount; i++){
+				document.getElementById("Heat" + ID + "Car" + i + "Place").innerHTML = "";
+				document.getElementById("Heat" + ID + "Car" + i + "Time").innerHTML = "";
+			}
+		}
+		
+		
+		function ClearRace(){
+			Heat = 1;
+			for(let i = 1; i <= HeatCount; i++){
+				ClearHeat(i);
+				for(let j = 1; j <= CarCount; j++){
+					document.getElementById("Heat" + i + "Car" + j + "Number").innerHTML = "";
+				}
+			}
+		}
+		
+		/**
+		 * @name connect
+		 * Opens a Web Serial connection to a micro:bit and sets up the input and
+		 * output stream.
+		 */
+		async function connect(){
+			// - Request a port and open a connection.
+			port = await navigator.serial.requestPort();
+			// - Wait for the port to open.
+			await port.open({ baudrate: 9600 });
+			// CODELAB: Add code setup the output stream here.
+
+			// CODELAB: Send CTRL-C and turn off echo on REPL
+			writeToStream('\x03', 'echo(false);');
+			// CODELAB: Add code to read the stream here.
+			let decoder = new TextDecoderStream();
+			inputDone = port.readable.pipeTo(decoder.writable);
+			inputStream = decoder.readable;
+
+			reader = inputStream.getReader();
+			readLoop();
+		}
+
+
+		/**
+		 * @name disconnect
+		 * Closes the Web Serial connection.
+		 */
+		async function disconnect() {
+			sendGrid();
+			// CODELAB: Close the input stream (reader).
+			if (reader) {
+				await reader.cancel();
+				await inputDone.catch(() => {});
+				reader = null;
+				inputDone = null;
+			}
+			// CODELAB: Close the output stream.
+			if (outputStream) {
+				await outputStream.getWriter().close();
+				await outputDone;
+				outputStream = null;
+				outputDone = null;
+			}
+			// CODELAB: Close the port.
+			await port.close();
+			port = null;
+		}
+
+
+		/**
+		 * @name clickConnect
+		 * Click handler for the connect/disconnect button.
+		 */
+		async function clickConnect() {
+			// CODELAB: Add disconnect code here.
+			if (port) {
+				await disconnect();
+				toggleUIConnected(false);
+				return;
+			}
+			// CODELAB: Add connect code here.
+			await connect();
+			// CODELAB: Reset the grid on connect here.
+
+			// CODELAB: Initialize micro:bit buttons.
+
+			toggleUIConnected(true);
+		}
+
+
+		/**
+		 * @name readLoop
+		 * Reads data from the input stream and displays it on screen.
+		 */
+		async function readLoop() {
+			let RawResults = "";
+			let Results = [];
+/*
+Results = ["@A=3.898!", 'B=4.135"', "C=7.780#", "C=7.855$"];
+//Extract the times and place then into the appropriate table
+for(let i = 1; i <= CarCount; i++){
+	Results[i - 1] = parseFloat(Results[i - 1].slice(-6, -1));
+	document.getElementById("Heat" + Heat + "Car" + i + "Time").innerHTML = Results[i - 1];
+}
+//"Zeroize" placing array
+for(let i = 0; i < CarCount; i++){
+	Position[i] = i + 1;
+}
+//Sort placings according to results
+let swapped;
+do{
+	swapped = false;
+	for(let i = 0; i < CarCount; i++){
+		if(Results[i] > Results[i + 1]){
+			let temp = Position[i];
+			Position[i] = Position[i + 1];
+			Position[i + 1] = temp;
+			temp = Results[i];
+			Results[i] = Results[i + 1];
+			Results[i + 1] = temp;
+			swapped = true;
+		}
+	}
+} while(swapped);
+//Fill the appropriate table with placings
+for(let i = 1; i <= CarCount; i ++){
+	document.getElementById("Heat" + Heat + "Car" + Position[i - 1] + "Place").innerHTML = i;
+}
+//
+Heat++;
+
+Results = ["@A=5.898!", 'B=1.135"', "C=9.780#", "C=5.855$"];
+//Extract the times and place then into the appropriate table
+for(let i = 1; i <= CarCount; i++){
+	Results[i - 1] = parseFloat(Results[i - 1].slice(-6, -1));
+	document.getElementById("Heat" + Heat + "Car" + i + "Time").innerHTML = Results[i - 1];
+}
+//"Zeroize" placing array
+for(let i = 0; i < CarCount; i++){
+	Position[i] = i + 1;
+}
+//Sort placings according to results
+do{
+	swapped = false;
+	for(let i = 0; i < CarCount; i++){
+		if(Results[i] > Results[i + 1]){
+			let temp = Position[i];
+			Position[i] = Position[i + 1];
+			Position[i + 1] = temp;
+			temp = Results[i];
+			Results[i] = Results[i + 1];
+			Results[i + 1] = temp;
+			swapped = true;
+		}
+	}
+} while(swapped);
+//Fill the appropriate table with placings
+for(let i = 1; i <= CarCount; i ++){
+	document.getElementById("Heat" + Heat + "Car" + Position[i - 1] + "Place").innerHTML = i;
+}
+//
+Heat++;
+
+Results = ["@A=8.898!", 'B=1.135"', "C=8.780#", "C=3.855$"];
+//Extract the times and place then into the appropriate table
+for(let i = 1; i <= CarCount; i++){
+	Results[i - 1] = parseFloat(Results[i - 1].slice(-6, -1));
+	document.getElementById("Heat" + Heat + "Car" + i + "Time").innerHTML = Results[i - 1];
+}
+//"Zeroize" placing array
+for(let i = 0; i < CarCount; i++){
+	Position[i] = i + 1;
+}
+//Sort placings according to results
+do{
+	swapped = false;
+	for(let i = 0; i < CarCount; i++){
+		if(Results[i] > Results[i + 1]){
+			let temp = Position[i];
+			Position[i] = Position[i + 1];
+			Position[i + 1] = temp;
+			temp = Results[i];
+			Results[i] = Results[i + 1];
+			Results[i + 1] = temp;
+			swapped = true;
+		}
+	}
+} while(swapped);
+//Fill the appropriate table with placings
+for(let i = 1; i <= CarCount; i ++){
+	document.getElementById("Heat" + Heat + "Car" + Position[i - 1] + "Place").innerHTML = i;
+}
+//
+Heat++;
+
+Results = ["@A=6.898!", 'B=2.135"', "C=9.780#", "C=3.855$"];
+//Extract the times and place then into the appropriate table
+for(let i = 1; i <= CarCount; i++){
+	Results[i - 1] = parseFloat(Results[i - 1].slice(-6, -1));
+	document.getElementById("Heat" + Heat + "Car" + i + "Time").innerHTML = Results[i - 1];
+}
+//"Zeroize" placing array
+for(let i = 0; i < CarCount; i++){
+	Position[i] = i + 1;
+}
+//Sort placings according to results
+do{
+	swapped = false;
+	for(let i = 0; i < CarCount; i++){
+		if(Results[i] > Results[i + 1]){
+			let temp = Position[i];
+			Position[i] = Position[i + 1];
+			Position[i + 1] = temp;
+			temp = Results[i];
+			Results[i] = Results[i + 1];
+			Results[i + 1] = temp;
+			swapped = true;
+		}
+	}
+} while(swapped);
+//Fill the appropriate table with placings
+for(let i = 1; i <= CarCount; i ++){
+	document.getElementById("Heat" + Heat + "Car" + Position[i - 1] + "Place").innerHTML = i;
+}
+//
+Heat++;
+if(Heat > HeatCount){
+	Heat = 1;
+}
+*/
+			while (true) {
+				const { value, done } = await reader.read();
+				if (value) {
+					if(value == "\r"){
+						Results = Results.split(" ");
+						//Extract the times and place then into the appropriate table
+						for(let i = 1; i <= CarCount; i++){
+							Results[i - 1] = parseFloat(Results[i - 1].slice(-6, -1));
+							document.getElementById("Heat" + Heat + "Car" + i + "Time").innerHTML = Results[i - 1];
+						}
+						//"Zeroize" placing array
+						for(let i = 0; i < CarCount; i++){
+							Position[i] = i + 1;
+						}
+						//Sort placings according to results
+						let swapped;
+						do{
+							swapped = false;
+							for(let i = 0; i < CarCount; i++){
+								if(Results[i] > Results[i + 1]){
+									let temp = Position[i];
+									Position[i] = Position[i + 1];
+									Position[i + 1] = temp;
+									temp = Results[i];
+									Results[i] = Results[i + 1];
+									Results[i + 1] = temp;
+									swapped = true;
+								}
+							}
+						} while(swapped);
+						//Fill the appropriate table with placings
+						for(let i = 1; i <= CarCount; i ++){
+							document.getElementById("Heat" + Heat + "Car" + Position[i - 1] + "Place").innerHTML = i;
+						}
+						RawResults = "";
+						Heat++;
+						if(Heat > HeatCount){
+							Heat = 1;
+						}
+					}
+					Results += value;
+					log.textContent += value;
+				}
+				if (done) {
+					console.log('[readLoop] DONE', done);
+					reader.releaseLock();
+					break;
+				}
+			}
+		}
+		
+
+		/**
+		 * @name sendGrid
+		 * Iterates over the checkboxes and generates the command to set the LEDs.
+		 */
+		function sendGrid() {
+		  // CODELAB: Generate the grid
+
+		}
+
+
+		/**
+		 * @name writeToStream
+		 * Gets a writer from the output stream and send the lines to the micro:bit.
+		 * @param  {...string} lines lines to send to the micro:bit
+		 */
+		function writeToStream(...lines) {
+		  // CODELAB: Write to output stream
+
+		}
+
+
+		/**
+		 * @name watchButton
+		 * Tells the micro:bit to print a string on the console on button press.
+		 * @param {String} btnId Button ID (either BTN1 or BTN2)
+		 */
+		function watchButton(btnId) {
+		  // CODELAB: Hook up the micro:bit buttons to print a string.
+
+		}
+
+
+		/**
+		 * @name LineBreakTransformer
+		 * TransformStream to parse the stream into lines.
+		 */
+		class LineBreakTransformer {
+		  constructor() {
+			// A container for holding stream data until a new line.
+			this.container = '';
+		  }
+
+		  transform(chunk, controller) {
+			// CODELAB: Handle incoming chunk
+
+		  }
+
+		  flush(controller) {
+			// CODELAB: Flush the stream.
+
+		  }
+		}
+
+
+		/**
+		 * @name JSONTransformer
+		 * TransformStream to parse the stream into a JSON object.
+		 */
+		class JSONTransformer {
+		  transform(chunk, controller) {
+			// CODELAB: Attempt to parse JSON content
+
+		  }
+		}
+
+
+		/**
+		 * @name buttonPushed
+		 * Event handler called when one of the micro:bit buttons is pushed.
+		 * @param {Object} butEvt
+		 */
+		function buttonPushed(butEvt) {
+		  // CODELAB: micro:bit button press handler
+
+		}
+
+		function toggleUIConnected(connected) {
+		  let lbl = 'Connect';
+		  if (connected) {
+			lbl = 'Disconnect';
+		  }
+		  butConnect.textContent = lbl;
+		}
+	</script>
+      
+    </main>
+  </body>
+</html>
